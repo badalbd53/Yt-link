@@ -1,0 +1,32 @@
+name: Update YouTube M3U8
+
+on:
+  schedule:
+    - cron: '0 */6 * * *' # প্রতি ৬ ঘণ্টা পর পর অটো আপডেট হবে
+  workflow_dispatch:      # ম্যানুয়ালি রান করার অপশন
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: ambassadors/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install yt-dlp
+        run: pip install yt-dlp
+
+      - name: Run Script
+        run: python update_m3u8.py
+
+      - name: Commit and Push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add live_playlist.m3u8
+          git commit -m "Updated M3U8 Playlist" || exit 0
+          git push
