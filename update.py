@@ -1,14 +1,18 @@
 import subprocess
 
-youtube_url = "https://www.youtube.com/watch?v=VIDEO_ID"
+channels = open("channels.txt").read().splitlines()
 
-cmd = ["yt-dlp", "-g", youtube_url]
+playlist = "#EXTM3U\n"
 
-result = subprocess.run(cmd, capture_output=True, text=True)
+for ch in channels:
+    try:
+        link = subprocess.check_output(
+            ["yt-dlp", "-g", ch]
+        ).decode().strip()
 
-m3u8_link = result.stdout.strip()
+        playlist += f"#EXTINF:-1,{ch}\n{link}\n"
 
-with open("stream.m3u8", "w") as f:
-    f.write("#EXTM3U\n")
-    f.write("#EXTINF:-1,YouTube Live\n")
-    f.write(m3u8_link)
+    except:
+        pass
+
+open("playlist.m3u8","w").write(playlist)
